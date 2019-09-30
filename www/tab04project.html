@@ -1,0 +1,321 @@
+<!DOCTYPE HTML>
+<HTML>
+
+<HEAD>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!-- A biblioteca bundle já contem os arquivos JS do Bootstrap, Popper, e jQuery.
+    <script src="js/bootstrap.bundle.js"></script>-->
+    <title>FTT EC LP2 N1!!</title>
+    <LINK REL="stylesheet" HREF="css/bootstrap.css" />
+    <STYLE>
+        
+        .start {background-color: blue;}
+         
+        #curve_chart{
+                width: 600px; 
+                height: 500px;
+                text-align: center;
+                margin-left: 36%;
+
+            }
+            #curve_chart{
+                width: 100%;
+                text-align: center;
+            }
+
+            #master{
+                width: 100%;
+                text-align: center;
+            }
+
+            #sectionTable{
+                width: 100%;
+                text-align: center;
+            }
+            table {
+               font-family: arial, sans-serif;
+               border-collapse: collapse;
+               border: 1px solid black;
+               text-align: center;
+               display: inline-block;
+            }
+             th, td {
+               border: 1px solid #dddddd;
+               padding: 8px;            
+               border: 1px solid black;
+               text-align: center;
+             }
+        .center-txt {
+            text-align: center;
+            color: black;
+            width: 90px;
+            padding: 4px;
+            margin:0;
+            border:0;
+        }
+        .button-selected {
+            background-color: #343a40;
+            color: white;
+            border-radius: 15px;
+        }       
+        .width-button-bar {
+            text-align: center;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            margin-right: 0;
+            margin-left: 0;
+            
+        }
+        .bottom-button-bar {
+            margin:0;
+            padding:0;
+            border:0;
+            width: 100%;
+        }
+        .icon-font {
+            font-size: 40px;   
+        }
+        main {
+            padding-top: 56px;
+            padding-bottom: 50px;
+        }
+
+        h1{
+                font-size: 40px;
+                font-family: 'Roboto', sans-serif;
+                text-align: center;
+                margin-top: 40px;
+                color: #15385F;
+            }          
+    </STYLE>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['line']});
+            google.charts.setOnLoadCallback(drawChart);
+      
+            function drawChart(array) {
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Tempo');
+                data.addColumn('number', 'Dolar');
+                data.addColumn('number', 'Euro');
+                data.addColumn('number', 'Real');
+          
+                data.addRows(array);
+          
+                var options = {
+                  chart: {
+                    title: 'CONVESOR HISTÓRICO DE MOEDAS',
+                    subtitle: 'KAIQUE BRABO'
+                  },
+                  width: 900,
+                  height: 500
+                };
+          
+                var chart = new google.charts.Line(document.getElementById('curve_chart'));
+          
+                chart.draw(data, google.charts.Line.convertOptions(options));
+              }
+          </script>
+
+        <script>
+            
+                function currencyCheck() {
+                    //debugger;
+                    // https://api.exchangeratesapi.io/history?start_at=2019-09-18&end_at=2019-09-19&base=USD                    
+                    var dateInicial = document.getElementById('dateInputInicial').value;                    
+                    var dateFinal = document.getElementById('dateInputFinal').value;
+                    var selectedValue = document.getElementById('xd').value;
+                    var userCurrency = selectedValue;
+                    var xmlhttp = new XMLHttpRequest();
+                    var url = `https://api.exchangeratesapi.io/history?start_at=${dateInicial}&end_at=${dateFinal}&base=${userCurrency}`;   
+                    var arrayGrafic = [];
+                        xmlhttp.onreadystatechange = function () {
+                            if (this.readyState == 4 && this.status == 200) {		 
+                                var valueResponse = JSON.parse(this.responseText);	
+                                var keys = Object.keys(valueResponse.rates);                           
+                                var tableBody = '';
+                                var tableHead = '';
+                                var array = [];
+                                for (var i = 0; i < keys.length; i++) {
+                                    var key = keys[i];
+                                    var rate = valueResponse.rates[key];                                    
+                                    arrayGrafic = valueResponse.rates;  
+                                    array.push(
+                                        [key, rate.CAD, rate.USD, rate.EUR]
+                                    );
+                                    console.log(arrayGrafic);               
+                                    if(selectedValue == 'BRL'){                                        
+                                        tableBody += `      
+                                        <tr>
+                                            <td> ${key} </td>
+                                            <td> ${rate.USD} </td>
+                                            <td> ${rate.EUR}</td>
+                                            <td> ${rate.CAD}</td>
+                                        </tr>
+                                    `;
+                                    } else if (selectedValue == 'CAD'){                                                               
+                                        tableBody += `
+                                        <tr>
+                                            <td> ${key} </td>
+                                            <td> ${rate.USD} </td>
+                                            <td> ${rate.EUR}</td>
+                                            <td> ${rate.BRL}</td>
+                                        </tr>
+                                    `;
+                                    } else if (selectedValue == 'EUR'){                                       
+                                        tableBody += `
+                                        <tr>
+                                            <td> ${key} </td>
+                                            <td> ${rate.USD} </td>
+                                            <td> ${rate.CAD}</td>
+                                            <td> ${rate.BRL}</td>
+                                        </tr>
+                                    `; 
+                                    } else {                                        
+                                        tableBody += `
+                                        <tr>
+                                            <td> ${key} </td>
+                                            <td> ${rate.EUR} </td>
+                                            <td> ${rate.CAD}</td>
+                                            <td> ${rate.BRL}</td>
+                                        </tr>
+                                    `; 
+                                    }                                   
+                                }
+                                if(selectedValue == 'BRL'){
+                                    tableHead += 
+                                        `<tr>
+                                            <th>Data</th>
+                                            <th>USD</th>
+                                            <th>EUR</th>
+                                            <th>CAD</th>     
+                                        </tr>                                      
+                                    `;
+                                } else if(selectedValue == 'CAD'){
+                                    tableHead += 
+                                        `<tr>
+                                            <th>Data</th>
+                                            <th>USD</th>
+                                            <th>EUR</th>
+                                            <th>BRL</th>     
+                                        </tr>                                      
+                                     `;
+                                } else if(selectedValue == 'EUR'){
+                                    tableHead += 
+                                        `<tr>
+                                            <th>Data</th>
+                                            <th>USD</th>
+                                            <th>CAD</th>
+                                            <th>BRL</th>     
+                                        </tr>                                      
+                                     `;
+                                } else if(selectedValue == 'USD'){
+                                    tableHead += 
+                                        `<tr>
+                                            <th>Data</th>
+                                            <th>EUR</th>
+                                            <th>CAD</th>
+                                            <th>BRL</th>     
+                                        </tr>                                      
+                                     `;
+                                }                     
+                                document.getElementById('thead').innerHTML = tableHead;
+                                document.getElementById('tbody').innerHTML = tableBody;
+
+                                drawChart(array);
+                            }
+                        };
+                    xmlhttp.open("GET", url, true);
+                    xmlhttp.send();
+                }                
+        </script>
+</HEAD>
+
+<BODY lang="pt-br">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <a class="navbar-brand" href="#">&#x1F981; FTT EC LP2 N1!!!</a>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+            <div class="navbar-nav float-right text-right pr-3">
+                <a class="nav-item nav-link" href="index.html">Splash</a>
+                <a class="nav-item nav-link" href="http://www.fundacaosalvadorarena.org.br/" target="newpage">CEFSA</a>
+                <a class="nav-item nav-link" href="about.html">Sobre</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container-fuild" id="aluno">
+        <hr>
+        <h1><span class="badge badge-success"></span></h1>
+            <h1>
+                Histórico de Moedas
+            </h1>
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <input class="form-control" id="dateInputInicial" type="date" name="date"> <br>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <input class="form-control" id="dateInputFinal" type="date" name="date"> <br>  
+                    </div>          
+                    
+                    <div class="col-md-2">
+                        <select class="form-control" id="xd">	
+                            <option value="BRL">REAL</option>	
+                            <option value="CAD">DOLAR CANADENSE</option>	
+                            <option value="EUR">EURO</option>	
+                            <option value="USD">DOLAR AMERICANO</option>	
+                        </select>	<br> 
+                    </div>  
+                    <div class="col-md-2">
+                            <button class="form-control" id = "buttonRates" onclick="currencyCheck()">Pesquisar</button>
+                        </div>   
+     
+                </div>
+            <div id="general" class="row">
+                <section id= "sectionTable" class = "col-md-12"> 
+                    <div>
+                        <table id="table">
+                            <thead id= "thead">
+                            </thead>
+                            <tbody id="tbody">                        
+                            </tbody>
+                        </table>    
+                    </div>
+                   <br>
+                   <div id="id01"></div>
+                                          
+                       <br>  
+                   </section>   
+               <div id="curve_chart"></div> 
+            </div>
+              
+    </main>
+
+    <nav class="navbar fixed-bottom navbar-light bg-light width-button-bar">
+        <div class="row w-100 bottom-button-bar">
+            <div class="col-sm center-txt"><b onclick='window.location="tab01news.html"'>News<br><span class="icon-font">&#x1f4f0;</span></b>
+            </div>
+            <div class="col-sm center-txt"><b onclick='window.location="tab02map.html"'>Map<br><span class="icon-font">&#x1f4cc;</span></b>
+            </div>
+            <div class="col-sm center-txt"><b onclick='window.location="tab03todo.html"'>Todo<br><span class="icon-font">&#x1F4DD;</span></b>
+            </div>
+            <div class="col-sm center-txt button-selected"><b onclick='window.location="tab04project.html"'>Currency<br><span class="icon-font">&#x1F981;</span></b>
+            </div>
+        </div>
+    </nav>
+</BODY>
+<!-- carga de scripts do Bootstrap, JQuery, Popper -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
+</HTML>
